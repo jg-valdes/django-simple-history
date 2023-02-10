@@ -1,8 +1,13 @@
 from django.db import connection, models
 from django.db.models import OuterRef, Subquery
 from django.utils import timezone
+from django.conf import settings
 
-from simple_history.utils import get_change_reason_from_object
+from simple_history.utils import get_change_reason_from_object, import_callable
+
+
+def get_history_manager_class():
+    return import_callable(getattr(settings, "SIMPLE_HISTORY_MANAGER", "simple_history.manager.HistoryManager"))
 
 
 class HistoryDescriptor:
@@ -10,9 +15,10 @@ class HistoryDescriptor:
         self.model = model
 
     def __get__(self, instance, owner):
+        HistoryManagerClass = get_history_manager_class()
         if instance is None:
-            return HistoryManager(self.model)
-        return HistoryManager(self.model, instance)
+            return HistoryManagerClass(self.model)
+        return HistoryManagerClass(self.model, instance)
 
 
 class HistoryManager(models.Manager):
