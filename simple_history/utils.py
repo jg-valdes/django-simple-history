@@ -1,8 +1,21 @@
+from importlib import import_module
 from django.db import transaction
 from django.db.models import Case, ForeignKey, ManyToManyField, Q, When
 from django.forms.models import model_to_dict
 
 from simple_history.exceptions import AlternativeManagerError, NotHistoricalModelError
+
+
+def import_callable(path_or_callable):
+    if hasattr(path_or_callable, '__call__'):
+        return path_or_callable
+    else:
+        assert isinstance(path_or_callable, str)
+        package_and_attr = path_or_callable.rsplit('.', 1)
+        if len(package_and_attr) == 2:
+            return getattr(import_module(package_and_attr[0]), package_and_attr[1])
+        else:
+            return import_module(package_and_attr[0])
 
 
 def update_change_reason(instance, reason):

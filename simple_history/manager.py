@@ -6,7 +6,14 @@ from django.utils import timezone
 from simple_history.utils import (
     get_app_model_primary_key_name,
     get_change_reason_from_object,
+    import_callable
 )
+
+
+def get_history_manager_class():
+    """Get HistoryManager class from settings"""
+    return import_callable(getattr(settings, "SIMPLE_HISTORY_MANAGER", "simple_history.manager.HistoryManager"))
+
 
 # when converting a historical record to an instance, this attribute is added
 # to the instance so that code can reverse the instance to its historical record
@@ -124,7 +131,8 @@ class HistoryDescriptor:
         self.model = model
 
     def __get__(self, instance, owner):
-        return HistoryManager.from_queryset(HistoricalQuerySet)(self.model, instance)
+        HistoryManagerClass = get_history_manager_class()
+        return HistoryManagerClass.from_queryset(HistoricalQuerySet)(self.model, instance)
 
 
 class HistoryManager(models.Manager):

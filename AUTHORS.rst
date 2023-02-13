@@ -133,6 +133,7 @@ Authors
 - `ddusi <https://github.com/ddusi>`_
 - `DanialErfanian <https://github.com/DanialErfanian>`_
 - `Sridhar Marella <https://github.com/sridhar562345>`_
+- Juan Gabriel Valdés Díaz (`jg-valdes <https://github.com/jg-valdes>`_)
 
 Background
 ==========
