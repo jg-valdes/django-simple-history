@@ -1,10 +1,12 @@
 from datetime import datetime
 from unittest.mock import Mock, patch
 
+import django
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.test import TestCase, TransactionTestCase
 from django.utils import timezone
+from django.test.utils import override_settings
 
 from simple_history.exceptions import AlternativeManagerError, NotHistoricalModelError
 from simple_history.tests.models import (
@@ -21,7 +23,15 @@ from simple_history.utils import (
     bulk_create_with_history,
     bulk_update_with_history,
     update_change_reason,
+    get_history_manager_for_model,
+    import_callable
 )
+from simple_history.tests.tests.utils import (
+    manager_override_settings,
+    CustomHistoryManager
+)
+from simple_history.manager import HistoryManager
+
 
 User = get_user_model()
 
@@ -453,3 +463,56 @@ class UpdateChangeReasonTestCase(TestCase):
         update_change_reason(poll, "Test change reason.")
         most_recent = poll.history.order_by("-history_date").first()
         self.assertEqual(most_recent.history_change_reason, "Test change reason.")
+
+
+class GetHistoryManagerTestCase(TestCase):
+    """test case for check HistoryManager loaded according to Setting"""
+
+    def test_get_history_manager_for_model_default(self):
+        poll = PollWithExcludeFields(
+            question="what's up?", pub_date=timezone.now(), place="The Pub"
+        )
+        poll.save()
+
+        manager = get_history_manager_for_model(poll)
+        self.assertEqual(manager.__class__, HistoryManager)
+        self.assertEqual(manager._db, None)
+
+    @override_settings(**manager_override_settings)
+    def test_get_history_manager_for_model_custom_manager(self):
+        poll = PollWithExcludeFields(
+            question="what's up?", pub_date=timezone.now(), place="The Pub"
+        )
+        poll.save()
+
+        manager = get_history_manager_for_model(poll)
+        self.assertEqual(manager.__class__, CustomHistoryManager)
+        self.assertEqual(manager._db, "replic_db")
+
+
+class ImportCallableTestCase(TestCase):
+    """Unit tests for callables"""
+
+    def test_import_callable_with_callable(self):
+        def dummy_func():
+            pass
+
+        result = import_callable(dummy_func)
+        self.assertEqual(result, dummy_func)
+
+    def test_import_callable_with_str(self):
+        result = import_callable('django.test.TestCase')
+        self.assertEqual(result, TestCase)
+
+    def test_import_callable_with_module(self):
+        result = import_callable('django')
+        self.assertEqual(result, django)
+
+    def test_import_callable_with_invalid_type(self):
+        with self.assertRaises(AssertionError):
+            import_callable(123)
+
+    def test_import_callable_with_invalid_str(self):
+        with self.assertRaises(AttributeError):
+            import_callable('django.non_existent_attribute')
+

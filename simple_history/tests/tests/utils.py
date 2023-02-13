@@ -1,6 +1,7 @@
 import django
 from django.conf import settings
 
+from simple_history.manager import HistoryManager
 from simple_history.tests.models import HistoricalModelWithHistoryInDifferentDb
 
 request_middleware = "simple_history.middleware.HistoryRequestMiddleware"
@@ -70,4 +71,15 @@ database_router_override_settings_history_in_diff_db = {
     "DATABASE_ROUTERS": [
         "simple_history.tests.tests.utils.TestModelWithHistoryInDifferentDbRouter"
     ]
+}
+
+# Define a custom manager for test util get_history_manager_for_model
+class CustomHistoryManager(HistoryManager):
+    def __init__(self, model, instance=None):
+        super(CustomHistoryManager, self).__init__(model, instance)
+        self._db = "replic_db"
+
+
+manager_override_settings = {
+    "SIMPLE_HISTORY_MANAGER": "simple_history.tests.tests.utils.CustomHistoryManager"
 }
