@@ -42,6 +42,13 @@ settings:
 If you do not want to use the middleware, you can explicitly indicate
 the user making the change as documented in :doc:`/user_tracking`.
 
+The historical models can have a custom manager for flexible manager behaviours
+adding to your Django settings:
+
+.. code-block:: python
+
+    SIMPLE_HISTORY_MANAGER = 'my_app.my_module.CustomHistoryManager'
+
 
 Track History
 ~~~~~~~~~~~~~

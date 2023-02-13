@@ -3,6 +3,17 @@ Changes
 
 Unreleased
 ----------
+3.0.1 (2023-02-13)
+------------------
+
+Breaking changes:
+
+- Adding setting for custom manager
+
+Full list of changes:
+
+- Adding setting ``SIMPLE_HISTORY_MANAGER`` for use custom manager at historical models
+
 
 3.0.0 (2021-04-16)
 ------------------

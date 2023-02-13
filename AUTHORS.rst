@@ -113,6 +113,7 @@ Authors
 - `Alex Todorov <https://github.com/atodorov>`_
 - David Smith (`smithdc1 <https://github.com/smithdc1>`_)
 - Shi Han Ng (`shihanng <https://github.com/shihanng>`_)
+- Juan Gabriel Valdés Díaz (`jg-valdes <https://github.com/jg-valdes>`_)
 
 Background
 ==========
